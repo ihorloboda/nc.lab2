@@ -4,6 +4,13 @@
 # Log file
 *.log
 
+# Pdf file
+*.pdf
+
+# diagrams
+db_metamodel_schema*
+erd*
+
 # Package Files #
 *.jar
 *.war
