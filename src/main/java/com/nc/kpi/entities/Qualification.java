@@ -1,9 +1,9 @@
 package com.nc.kpi.entities;
 
-import lombok.Data;
+import lombok.*;
 
 @Data
-public class Role {
+public class Qualification {
     private Long id;
     private String name;
     private String desc;

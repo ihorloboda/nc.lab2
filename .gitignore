@@ -11,6 +11,12 @@
 db_metamodel_schema*
 erd*
 
+#questions
+questions.txt
+
+# properties
+db.properties
+
 # Package Files #
 *.jar
 *.war
