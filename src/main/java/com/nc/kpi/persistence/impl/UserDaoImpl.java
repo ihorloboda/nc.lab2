@@ -12,11 +12,6 @@ public class UserDaoImpl extends AbstractDao<User> implements UserDao {
     private final String SQL_FIND_PATH = "users/find.sql";
     private final String SQL_ADD_PATH = "users/add.sql";
 
-    private final Integer USER_TYPE_ID = 3;
-    private final Integer BIO_ATTR_ID = 1;
-    private final Integer ROLES_ATTR_ID = 2;
-    private final Integer QUALIFICATION_ATTR_ID = 3;
-
     @Autowired
     public UserDaoImpl(JdbcTemplate jdbcTemplate) {
         super(jdbcTemplate);

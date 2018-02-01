@@ -3,6 +3,7 @@ package com.nc.kpi.persistence.impl;
 import com.nc.kpi.entities.Qualification;
 import com.nc.kpi.persistence.QualificationDao;
 import com.nc.kpi.persistence.AbstractDao;
+import com.nc.kpi.persistence.metamodel.consts.Types;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -18,8 +19,6 @@ public class QualificationDaoImpl extends AbstractDao<Qualification> implements 
     private final String SQL_UPDATE_PATH = "qualifications/update.sql";
     private final String SQL_DELETE_PATH = "qualifications/delete.sql";
 
-    private final Integer QUALIFICATION_TYPE_ID = 2;
-
     @Autowired
     public QualificationDaoImpl(JdbcTemplate jdbcTemplate) {
         super(jdbcTemplate);
@@ -34,8 +33,8 @@ public class QualificationDaoImpl extends AbstractDao<Qualification> implements 
     @Override
     public void add(Qualification entity) {
         String sql = loadSqlStatement(SQL_ADD_PATH);
-        entity.setId(generateId(QUALIFICATION_TYPE_ID));
-        executeUpdate(sql, entity.getId(), QUALIFICATION_TYPE_ID, entity.getName(), entity.getDesc());
+        entity.setId(generateId(Types.QUALIFICATION));
+        executeUpdate(sql, entity.getId(), Types.QUALIFICATION, entity.getName(), entity.getDesc());
     }
 
     @Override

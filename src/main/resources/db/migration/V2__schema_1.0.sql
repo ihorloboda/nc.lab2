@@ -1,3 +1,13 @@
+DROP TABLE "refs";
+DROP TABLE "params";
+DROP TABLE "grants";
+DROP TABLE "roles";
+DROP TABLE "objects";
+DROP TABLE "attr_binds";
+DROP TABLE "attrs";
+DROP TABLE "types";
+DROP TABLE "attr_types";
+
 --Creating base metamodel tables
 CREATE TABLE "types" (
   "type_id"        NUMBER(20, 0) NOT NULL,
@@ -15,14 +25,12 @@ CREATE TABLE "attr_types" (
 );
 
 CREATE TABLE "attrs" (
-  "attr_id"        NUMBER(20, 0) NOT NULL,
-  "attr_type_id"   NUMBER(20, 0) NOT NULL,
-  "attr_name"      VARCHAR2(100) NOT NULL,
-  "multiple"       NUMBER(1, 0),
-  "parent_attr_id" NUMBER(20, 0) DEFAULT 0,
+  "attr_id"      NUMBER(20, 0) NOT NULL,
+  "attr_type_id" NUMBER(20, 0) NOT NULL,
+  "attr_name"    VARCHAR2(100) NOT NULL,
+  "multiple"     NUMBER(1, 0),
   CONSTRAINT "attrs_pk" PRIMARY KEY ("attr_id"),
-  CONSTRAINT "attrs_attr_types_fk" FOREIGN KEY ("attr_type_id") REFERENCES "attr_types",
-  CONSTRAINT "attrs_attrs_fk" FOREIGN KEY ("parent_attr_id") REFERENCES "attrs"
+  CONSTRAINT "attrs_attr_types_fk" FOREIGN KEY ("attr_type_id") REFERENCES "attr_types"
 );
 
 CREATE TABLE "attr_binds" (
@@ -90,9 +98,6 @@ CREATE TABLE "grants" (
 
 --Inserting attribute types values
 INSERT INTO "attr_types" ("attr_type_id", "attr_type_name") VALUES
-  (0, 'ROOT');
-
-INSERT INTO "attr_types" ("attr_type_id", "attr_type_name") VALUES
   (1, 'REF');
 
 INSERT INTO "attr_types" ("attr_type_id", "attr_type_name") VALUES
@@ -106,10 +111,6 @@ INSERT INTO "attr_types" ("attr_type_id", "attr_type_name") VALUES
 
 INSERT INTO "attr_types" ("attr_type_id", "attr_type_name") VALUES
   (5, 'BOOLEAN');
-
---Inserting root attribute
-INSERT INTO "attrs" ("attr_id", "attr_type_id", "attr_name", "parent_attr_id") VALUES
-  (0, 0, 'Root', NULL);
 
 --Inserting attributes
 INSERT INTO "attrs" ("attr_id", "attr_type_id", "attr_name", "multiple") VALUES
