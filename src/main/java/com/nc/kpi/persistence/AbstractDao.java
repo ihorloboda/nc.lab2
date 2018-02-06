@@ -1,5 +1,8 @@
 package com.nc.kpi.persistence;
 
+import com.nc.kpi.persistence.metamodel.rows.MetamodelObject;
+import com.nc.kpi.persistence.metamodel.rows.Param;
+import com.nc.kpi.persistence.metamodel.rows.Ref;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -14,11 +17,14 @@ import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
+import static lombok.AccessLevel.PUBLIC;
 
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class AbstractDao<T> {
@@ -27,6 +33,9 @@ public abstract class AbstractDao<T> {
     private final Integer MIN_INCLUSIVE_BOUND = 100;
 
     private final JdbcTemplate jdbcTemplate;
+
+    //metamodel default version of object
+    protected final Long DEFAULT_OBJECT_VERSION = 1L;
 
     //metamodel type constants
     protected final Integer TYPE_ROLE = 1;
@@ -63,25 +72,10 @@ public abstract class AbstractDao<T> {
     protected final String SQL_OBJECT_FIND_PATH = "objects/find.sql";
     protected final String SQL_OBJECT_UPDATE_PATH = "objects/update.sql";
 
-    protected final String SQL_PARAM_BOOLEAN_ADD_PATH = "params/boolean/add.sql";
-    protected final String SQL_PARAM_BOOLEAN_DELETE_PATH = "params/delete.sql";
-    protected final String SQL_PARAM_BOOLEAN_FIND_PATH = "params/boolean/find.sql";
-    protected final String SQL_PARAM_BOOLEAN_UPDATE_PATH = "params/boolean/update.sql";
-
-    protected final String SQL_PARAM_DATE_ADD_PATH = "params/date/add.sql";
-    protected final String SQL_PARAM_DATE_DELETE_PATH = "params/delete.sql";
-    protected final String SQL_PARAM_DATE_FIND_PATH = "params/date/find.sql";
-    protected final String SQL_PARAM_DATE_UPDATE_PATH = "params/date/update.sql";
-
-    protected final String SQL_PARAM_NUMBER_ADD_PATH = "params/number/add.sql";
-    protected final String SQL_PARAM_NUMBER_DELETE_PATH = "params/delete.sql";
-    protected final String SQL_PARAM_NUMBER_FIND_PATH = "params/number/find.sql";
-    protected final String SQL_PARAM_NUMBER_UPDATE_PATH = "params/number/update.sql";
-
-    protected final String SQL_PARAM_TEXT_ADD_PATH = "params/text/add.sql";
-    protected final String SQL_PARAM_TEXT_DELETE_PATH = "params/delete.sql";
-    protected final String SQL_PARAM_TEXT_FIND_PATH = "params/text/find.sql";
-    protected final String SQL_PARAM_TEXT_UPDATE_PATH = "params/text/update.sql";
+    protected final String SQL_PARAM_ADD_PATH = "params/text/add.sql";
+    protected final String SQL_PARAM_DELETE_PATH = "params/delete.sql";
+    protected final String SQL_PARAM_FIND_PATH = "params/text/find.sql";
+    protected final String SQL_PARAM_UPDATE_PATH = "params/text/update.sql";
 
     protected final String SQL_REF_ADD_PATH = "refs/add.sql";
     protected final String SQL_REF_DELETE_ONE_PATH = "refs/deleteOne.sql";
@@ -120,11 +114,11 @@ public abstract class AbstractDao<T> {
     protected final String READ = "read";
     protected final String WRITE = "write";
 
-    protected abstract T mapObject(Map<String, ?> objectMap);
+    protected abstract T mapObject(MetamodelObject object);
 
-    protected abstract T mapParams(Map<String, ?> paramMap, T entity);
+    protected abstract T mapParams(Param param, T entity);
 
-    protected abstract T mapRefs(Map<String, ?> refMap, T entity);
+    protected abstract T mapRefs(Ref ref, T entity);
 
     protected String loadSqlStatement(String path) {
         StringBuilder stringBuilder = new StringBuilder();
@@ -144,8 +138,8 @@ public abstract class AbstractDao<T> {
         return jdbcTemplate.batchUpdate(sql, params);
     }
 
-    protected Map<String, Object> findOne(String sql, RowMapper<Map<String, Object>> rowMapper, Object... params) {
-        List<Map<String, Object>> query = jdbcTemplate.query(sql, rowMapper, params);
+    protected <E> E findOne(String sql, RowMapper<E> rowMapper, Object... params) {
+        List<E> query = jdbcTemplate.query(sql, rowMapper, params);
         switch (query.size()) {
             case 0:
                 return null;
@@ -157,7 +151,7 @@ public abstract class AbstractDao<T> {
     }
 
     //TODO remake when it will be needed
-    protected List<T> findMultiple(String sql, RowMapper<T> rowMapper, Object... params) {
+    protected <E> List<E> findMultiple(String sql, RowMapper<E> rowMapper, Object... params) {
         return jdbcTemplate.query(sql, rowMapper, params);
     }
 
@@ -172,16 +166,56 @@ public abstract class AbstractDao<T> {
         return Long.valueOf(id);
     }
 
-    @NoArgsConstructor(access = AccessLevel.PUBLIC)
-    protected class ObjectMapRowMapper implements RowMapper<Map<String, Object>> {
+//    @NoArgsConstructor(access = PUBLIC)
+//    protected class ObjectMapRowMapper implements RowMapper<Map<String, ?>> {
+//        @Override
+//        public Map<String, ?> mapRow(ResultSet rs, int rowNum) throws SQLException {
+//            Map<String, Object> row = new HashMap<>();
+//            row.put(OBJECT_ID, rs.getLong(OBJECT_ID));
+//            row.put(OBJECT_VERSION, rs.getLong(OBJECT_VERSION));
+//            row.put(OBJECT_NAME, rs.getString(OBJECT_NAME));
+//            row.put(OBJECT_DESC, rs.getString(OBJECT_DESC));
+//            return row;
+//        }
+//    }
+
+    @NoArgsConstructor(access = PUBLIC)
+    protected class ObjectRowMapper implements RowMapper<MetamodelObject> {
         @Override
-        public Map<String, Object> mapRow(ResultSet rs, int rowNum) throws SQLException {
-            Map<String, Object> row = new HashMap<>();
-            row.put(OBJECT_ID, rs.getLong(OBJECT_ID));
-            row.put(OBJECT_VERSION, rs.getLong(OBJECT_VERSION));
-            row.put(OBJECT_NAME, rs.getString(OBJECT_NAME));
-            row.put(OBJECT_DESC, rs.getString(OBJECT_DESC));
-            return row;
+        public MetamodelObject mapRow(ResultSet rs, int rowNum) throws SQLException {
+            MetamodelObject object = new MetamodelObject();
+            object.setId(rs.getLong(OBJECT_ID));
+            object.setVersion(rs.getLong(OBJECT_VERSION));
+            object.setName(rs.getString(OBJECT_NAME));
+            object.setDesc(rs.getString(OBJECT_DESC));
+            return object;
+        }
+    }
+
+    @NoArgsConstructor(access = PUBLIC)
+    protected class RefRowMapper implements RowMapper<Ref> {
+        @Override
+        public Ref mapRow(ResultSet rs, int rowNum) throws SQLException {
+            Ref ref = new Ref();
+            ref.setObjectId(rs.getLong(OBJECT_ID));
+            ref.setAttrId(rs.getLong(ATTR_ID));
+            ref.setRefId(rs.getLong(REF_OBJECT_ID));
+            return ref;
+        }
+    }
+
+    @NoArgsConstructor(access = PUBLIC)
+    protected class ParamRowMapper implements RowMapper<Param> {
+        @Override
+        public Param mapRow(ResultSet rs, int rowNum) throws SQLException {
+            Param param = new Param();
+            param.setObjectId(rs.getLong(OBJECT_ID));
+            param.setAttrId(rs.getLong(ATTR_ID));
+            param.setBooleanVal(rs.getBoolean(BOOLEAN_VAL));
+            param.setDateVal(OffsetDateTime.ofInstant(rs.getTimestamp(DATE_VAL).toInstant(), ZoneId.systemDefault()));
+            param.setNumberVal(rs.getLong(NUMBER_VAL));
+            param.setTextVal(rs.getString(TEXT_VAL));
+            return param;
         }
     }
 }

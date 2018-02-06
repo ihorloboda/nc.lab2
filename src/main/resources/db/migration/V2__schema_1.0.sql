@@ -1,11 +1,12 @@
 DROP TABLE "refs";
 DROP TABLE "params";
+DROP TABLE "attr_binds";
+DROP TABLE "grants";
 DROP TABLE "roles";
 DROP TABLE "objects";
-DROP TABLE "attr_binds";
 DROP TABLE "attrs";
-DROP TABLE "types";
 DROP TABLE "attr_types";
+DROP TABLE "types";
 
 --Creating base metamodel tables
 CREATE TABLE "types" (

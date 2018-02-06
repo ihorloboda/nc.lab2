@@ -1,23 +1,20 @@
 package com.nc.kpi.persistence.impl;
 
-import com.nc.kpi.entities.Qualification;
 import com.nc.kpi.entities.User;
 import com.nc.kpi.persistence.AbstractDao;
 import com.nc.kpi.persistence.UserDao;
+import com.nc.kpi.persistence.metamodel.rows.MetamodelObject;
+import com.nc.kpi.persistence.metamodel.rows.Param;
+import com.nc.kpi.persistence.metamodel.rows.Ref;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-//TODO add managed and ordered projects
+//TODO add managed and ordered projects, tasks
 @Repository
 public class UserDaoImpl extends AbstractDao<User> implements UserDao {
     @Autowired
@@ -29,8 +26,10 @@ public class UserDaoImpl extends AbstractDao<User> implements UserDao {
     @Transactional
     public User find(Long id) {
         String sqlObjectFind = loadSqlStatement(SQL_OBJECT_FIND_PATH);
-        String sqlRefFind = loadSqlStatement(SQL_REF_FIND_PATH);
-
+        String sqlParamsFind = loadSqlStatement(SQL_PARAM_FIND_PATH);
+        String sqlRefsFind = loadSqlStatement(SQL_REF_FIND_PATH);
+        User user = mapObject(findOne(sqlObjectFind, new ObjectRowMapper(), id));
+        //TODO
 
         return null;
     }
@@ -40,9 +39,12 @@ public class UserDaoImpl extends AbstractDao<User> implements UserDao {
     //TODO read chapter 10 Spring transactions
     public void add(User entity) {
         String sqlObjectAdd = loadSqlStatement(SQL_OBJECT_ADD_PATH);
+        String sqlTextParamAdd = loadSqlStatement(SQL_PARAM_ADD_PATH);
         String sqlRefAdd = loadSqlStatement(SQL_REF_ADD_PATH);
         entity.setId(generateId(TYPE_USER));
-        executeUpdate(sqlObjectAdd, entity.getId(), TYPE_USER, entity.getName(), entity.getDesc());
+        entity.setVersion(DEFAULT_OBJECT_VERSION);
+        executeUpdate(sqlObjectAdd, entity.getId(), entity.getVersion(), TYPE_USER, entity.getName(), entity.getDesc());
+        executeUpdate(sqlTextParamAdd, entity.getId(), ATTR_BIO, entity.getBio());
         executeUpdate(sqlRefAdd, entity.getId(), ATTR_QUALIFICATION, entity.getQualification().getId());
         executeBatchUpdate(sqlRefAdd, getBatchRefs(entity));
     }
@@ -67,37 +69,17 @@ public class UserDaoImpl extends AbstractDao<User> implements UserDao {
     }
 
     @Override
-    protected User mapObject(Map<String, ?> objectMap) {
+    protected User mapObject(MetamodelObject object) {
         return null;
     }
 
     @Override
-    protected User mapParams(Map<String, ?> paramMap, User entity) {
+    protected User mapParams(Param param, User entity) {
         return null;
     }
 
     @Override
-    protected User mapRefs(Map<String, ?> refMap, User entity) {
+    protected User mapRefs(Ref ref, User entity) {
         return null;
-    }
-
-    private class UserRowMapper implements RowMapper<User> {
-        @Override
-        public User mapRow(ResultSet rs, int rowNum) throws SQLException {
-            User user = new User();
-            user.setId(rs.getLong(OBJECT_ID));
-            user.setName(rs.getString(OBJECT_NAME));
-            user.setDesc(rs.getString(OBJECT_DESC));
-            return user;
-        }
-    }
-
-    private class UserRefsRowMapper implements RowMapper<Map<String, Object>> {
-        @Override
-        public Map<String, Object> mapRow(ResultSet rs, int rowNum) throws SQLException {
-            Map<String, Object> refs = new HashMap<>();
-            Qualification qualification = new Qualification();
-            return refs;
-        }
     }
 }

@@ -3,6 +3,9 @@ package com.nc.kpi.persistence.impl;
 import com.nc.kpi.entities.Role;
 import com.nc.kpi.persistence.AbstractDao;
 import com.nc.kpi.persistence.RoleDao;
+import com.nc.kpi.persistence.metamodel.rows.MetamodelObject;
+import com.nc.kpi.persistence.metamodel.rows.Param;
+import com.nc.kpi.persistence.metamodel.rows.Ref;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -12,8 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 
 @Repository
 public class RoleDaoImpl extends AbstractDao<Role> implements RoleDao {
@@ -32,8 +33,8 @@ public class RoleDaoImpl extends AbstractDao<Role> implements RoleDao {
     public Role find(Long id) {
         String sqlRoles = loadSqlStatement(SQL_ROLE_FIND_PATH);
         String sqlObjects = loadSqlStatement(SQL_OBJECT_FIND_PATH);
-        Role roleFromRoles = mapRole(findOne(sqlRoles, new RoleMapRowMapper(), id), ROLE_ID, ROLE_NAME, ROLE_DESC);
-        Role roleFromObjects = mapObject(findOne(sqlObjects, new ObjectMapRowMapper(), id));
+        Role roleFromRoles = mapObject(findOne(sqlRoles, new roleRowMapper(), id));
+        Role roleFromObjects = mapObject(findOne(sqlObjects, new ObjectRowMapper(), id));
         if ((roleFromRoles != null & roleFromObjects != null) && (roleFromRoles.equals(roleFromObjects))
                 || (roleFromRoles == null && roleFromObjects == null)) {
             return roleFromRoles;
@@ -70,40 +71,36 @@ public class RoleDaoImpl extends AbstractDao<Role> implements RoleDao {
         executeUpdate(sqlObjects, id);
     }
 
-    private class RoleMapRowMapper implements RowMapper<Map<String, Object>> {
+    private class roleRowMapper implements RowMapper<MetamodelObject> {
         @Override
-        public Map<String, Object> mapRow(ResultSet rs, int rowNum) throws SQLException {
-            Map<String, Object> roleMap = new HashMap<>();
-            roleMap.put(ROLE_ID, rs.getLong(ROLE_ID));
-            roleMap.put(ROLE_NAME, rs.getString(ROLE_NAME));
-            roleMap.put(ROLE_DESC, rs.getString(ROLE_DESC));
-            return roleMap;
+        public MetamodelObject mapRow(ResultSet rs, int rowNum) throws SQLException {
+            MetamodelObject object = new MetamodelObject();
+            object.setId(rs.getLong(ROLE_ID));
+            object.setName(rs.getString(ROLE_NAME));
+            object.setDesc(rs.getString(ROLE_DESC));
+            return object;
         }
     }
 
-    private Role mapRole(Map<String, ?> roleMap, String idParam, String nameParam, String descParam) {
-        if (roleMap == null) {
+    @Override
+    protected Role mapObject(MetamodelObject object) {
+        if (object == null) {
             return null;
         }
         Role role = new Role();
-        role.setId((Long) roleMap.get(idParam));
-        role.setName((String) roleMap.get(nameParam));
-        role.setDesc((String) roleMap.get(descParam));
+        role.setId(object.getId());
+        role.setName(object.getName());
+        role.setDesc(object.getDesc());
         return role;
     }
 
     @Override
-    protected Role mapObject(Map<String, ?> objectMap) {
-        return mapRole(objectMap, OBJECT_ID, OBJECT_NAME, OBJECT_DESC);
-    }
-
-    @Override
-    protected Role mapParams(Map<String, ?> paramMap, Role entity) {
+    protected Role mapParams(Param param, Role entity) {
         throw new UnsupportedOperationException("RoleDao mapParams");
     }
 
     @Override
-    protected Role mapRefs(Map<String, ?> refMap, Role entity) {
+    protected Role mapRefs(Ref ref, Role entity) {
         throw new UnsupportedOperationException("RoleDao mapRefs");
     }
 }

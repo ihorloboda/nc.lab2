@@ -3,11 +3,12 @@ package com.nc.kpi.persistence.impl;
 import com.nc.kpi.entities.Qualification;
 import com.nc.kpi.persistence.AbstractDao;
 import com.nc.kpi.persistence.QualificationDao;
+import com.nc.kpi.persistence.metamodel.rows.MetamodelObject;
+import com.nc.kpi.persistence.metamodel.rows.Param;
+import com.nc.kpi.persistence.metamodel.rows.Ref;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-
-import java.util.Map;
 
 @Repository
 public class QualificationDaoImpl extends AbstractDao<Qualification> implements QualificationDao {
@@ -19,7 +20,7 @@ public class QualificationDaoImpl extends AbstractDao<Qualification> implements 
     @Override
     public Qualification find(Long id) {
         String sql = loadSqlStatement(SQL_OBJECT_FIND_PATH);
-        return mapObject(findOne(sql, new ObjectMapRowMapper(), id));
+        return mapObject(findOne(sql, new ObjectRowMapper(), id));
     }
 
     @Override
@@ -42,24 +43,24 @@ public class QualificationDaoImpl extends AbstractDao<Qualification> implements 
     }
 
     @Override
-    protected Qualification mapObject(Map<String, ?> objectMap) {
-        if (objectMap == null) {
+    protected Qualification mapObject(MetamodelObject object) {
+        if (object == null) {
             return null;
         }
         Qualification qualification = new Qualification();
-        qualification.setId((Long) objectMap.get(OBJECT_ID));
-        qualification.setName((String) objectMap.get(OBJECT_NAME));
-        qualification.setDesc((String) objectMap.get(OBJECT_DESC));
+        qualification.setId(object.getId());
+        qualification.setName(object.getName());
+        qualification.setDesc(object.getDesc());
         return qualification;
     }
 
     @Override
-    protected Qualification mapParams(Map<String, ?> paramMap, Qualification entity) {
+    protected Qualification mapParams(Param param, Qualification entity) {
         throw new UnsupportedOperationException("QualificationDao mapParams");
     }
 
     @Override
-    protected Qualification mapRefs(Map<String, ?> refMap, Qualification entity) {
+    protected Qualification mapRefs(Ref ref, Qualification entity) {
         throw new UnsupportedOperationException("QualificationDao mapRefs");
     }
 }
