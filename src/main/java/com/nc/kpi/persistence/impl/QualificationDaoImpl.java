@@ -1,24 +1,16 @@
 package com.nc.kpi.persistence.impl;
 
 import com.nc.kpi.entities.Qualification;
-import com.nc.kpi.persistence.QualificationDao;
 import com.nc.kpi.persistence.AbstractDao;
-import com.nc.kpi.persistence.metamodel.consts.Types;
+import com.nc.kpi.persistence.QualificationDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.Map;
 
 @Repository
 public class QualificationDaoImpl extends AbstractDao<Qualification> implements QualificationDao {
-    private final String SQL_FIND_PATH = "qualifications/find.sql";
-    private final String SQL_ADD_PATH = "qualifications/add.sql";
-    private final String SQL_UPDATE_PATH = "qualifications/update.sql";
-    private final String SQL_DELETE_PATH = "qualifications/delete.sql";
-
     @Autowired
     public QualificationDaoImpl(JdbcTemplate jdbcTemplate) {
         super(jdbcTemplate);
@@ -26,37 +18,48 @@ public class QualificationDaoImpl extends AbstractDao<Qualification> implements 
 
     @Override
     public Qualification find(Long id) {
-        String sql = loadSqlStatement(SQL_FIND_PATH);
-        return findOne(sql, new QualificationRowMapper(), id);
+        String sql = loadSqlStatement(SQL_OBJECT_FIND_PATH);
+        return mapObject(findOne(sql, new ObjectMapRowMapper(), id));
     }
 
     @Override
     public void add(Qualification entity) {
-        String sql = loadSqlStatement(SQL_ADD_PATH);
-        entity.setId(generateId(Types.QUALIFICATION));
-        executeUpdate(sql, entity.getId(), Types.QUALIFICATION, entity.getName(), entity.getDesc());
+        String sql = loadSqlStatement(SQL_OBJECT_ADD_PATH);
+        entity.setId(generateId(TYPE_QUALIFICATION));
+        executeUpdate(sql, entity.getId(), null, TYPE_QUALIFICATION, entity.getName(), entity.getDesc());
     }
 
     @Override
     public void update(Qualification entity) {
-        String sql = loadSqlStatement(SQL_UPDATE_PATH);
-        executeUpdate(sql, entity.getName(), entity.getDesc(), entity.getId());
+        String sql = loadSqlStatement(SQL_OBJECT_UPDATE_PATH);
+        executeUpdate(sql, null, entity.getName(), entity.getDesc(), entity.getId());
     }
 
     @Override
     public void delete(Long id) {
-        String sql = loadSqlStatement(SQL_DELETE_PATH);
+        String sql = loadSqlStatement(SQL_OBJECT_DELETE_PATH);
         executeUpdate(sql, id);
     }
 
-    private class QualificationRowMapper implements RowMapper<Qualification> {
-        @Override
-        public Qualification mapRow(ResultSet rs, int rowNum) throws SQLException {
-            Qualification qualification = new Qualification();
-            qualification.setId(rs.getLong("object_id"));
-            qualification.setName(rs.getString("object_name"));
-            qualification.setDesc(rs.getString("object_desc"));
-            return qualification;
+    @Override
+    protected Qualification mapObject(Map<String, ?> objectMap) {
+        if (objectMap == null) {
+            return null;
         }
+        Qualification qualification = new Qualification();
+        qualification.setId((Long) objectMap.get(OBJECT_ID));
+        qualification.setName((String) objectMap.get(OBJECT_NAME));
+        qualification.setDesc((String) objectMap.get(OBJECT_DESC));
+        return qualification;
+    }
+
+    @Override
+    protected Qualification mapParams(Map<String, ?> paramMap, Qualification entity) {
+        throw new UnsupportedOperationException("QualificationDao mapParams");
+    }
+
+    @Override
+    protected Qualification mapRefs(Map<String, ?> refMap, Qualification entity) {
+        throw new UnsupportedOperationException("QualificationDao mapRefs");
     }
 }

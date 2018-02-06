@@ -1,8 +1,8 @@
 package com.nc.kpi.persistance;
 
 import com.nc.kpi.config.AppConfig;
-import com.nc.kpi.entities.Qualification;
-import com.nc.kpi.persistence.QualificationDao;
+import com.nc.kpi.entities.Role;
+import com.nc.kpi.persistence.RoleDao;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.junit.Assert;
@@ -15,17 +15,17 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = AppConfig.class, loader = AnnotationConfigContextLoader.class)
 @NoArgsConstructor
-public class QualificationDaoTest extends CrudDaoTest<Qualification> {
+public class RoleDaoTest extends CrudDaoTest<Role> {
     @Autowired
     @Setter
-    private QualificationDao dao;
+    private RoleDao roleDao;
 
     @Override
     public void before() {
-        forAdd = new Qualification();
-        forFind = new Qualification();
-        forUpdate = new Qualification();
-        forDelete = new Qualification();
+        forAdd = new Role();
+        forFind = new Role();
+        forUpdate = new Role();
+        forDelete = new Role();
         forAdd.setName(FOR_ADD_NAME);
         forFind.setName(FOR_FIND_NAME);
         forUpdate.setName(FOR_UPDATE_NAME);
@@ -34,47 +34,47 @@ public class QualificationDaoTest extends CrudDaoTest<Qualification> {
         forFind.setDesc(FOR_FIND_DESC);
         forUpdate.setDesc(FOR_UPDATE_DESC);
         forDelete.setDesc(FOR_DELETE_DESC);
-        dao.add(forFind);
-        dao.add(forUpdate);
-        dao.add(forDelete);
+        roleDao.add(forFind);
+        roleDao.add(forUpdate);
+        roleDao.add(forDelete);
     }
 
     @Override
     public void after() {
-        dao.delete(forAdd.getId());
-        dao.delete(forFind.getId());
-        dao.delete(forUpdate.getId());
-        dao.delete(forDelete.getId());
-    }
-
-    @Override
-    public void find() {
-        Qualification expected = forFind;
-        Qualification actual = dao.find(forFind.getId());
-        Assert.assertEquals(expected, actual);
+        roleDao.delete(forAdd.getId());
+        roleDao.delete(forFind.getId());
+        roleDao.delete(forUpdate.getId());
+        roleDao.delete(forDelete.getId());
     }
 
     @Override
     public void add() {
-        Qualification expected = forAdd;
-        dao.add(expected);
-        Qualification actual = dao.find(expected.getId());
+        Role expected = forAdd;
+        roleDao.add(expected);
+        Role actual = roleDao.find(expected.getId());
         Assert.assertEquals(expected, actual);
     }
 
     @Override
     public void delete() {
-        dao.delete(forDelete.getId());
-        Assert.assertNull(dao.find(forDelete.getId()));
+        roleDao.delete(forDelete.getId());
+        Assert.assertNull(roleDao.find(forDelete.getId()));
+    }
+
+    @Override
+    public void find() {
+        Role expected = forFind;
+        Role actual = roleDao.find(forFind.getId());
+        Assert.assertEquals(expected, actual);
     }
 
     @Override
     public void update() {
         final String TEST_NAME = "updated name";
         forUpdate.setName(TEST_NAME);
-        Qualification expected = forUpdate;
-        dao.update(forUpdate);
-        Qualification actual = dao.find(forUpdate.getId());
+        Role expected = forUpdate;
+        roleDao.update(forUpdate);
+        Role actual = roleDao.find(forUpdate.getId());
         Assert.assertEquals(expected, actual);
     }
 }

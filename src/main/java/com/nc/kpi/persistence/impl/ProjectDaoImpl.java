@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.Map;
+
 @Repository
 public class ProjectDaoImpl extends AbstractDao<Project> implements ProjectDao {
     @Autowired
@@ -32,5 +34,20 @@ public class ProjectDaoImpl extends AbstractDao<Project> implements ProjectDao {
     @Override
     public void delete(Long id) {
 
+    }
+
+    @Override
+    protected Project mapObject(Map<String, ?> objectMap) {
+        return null;
+    }
+
+    @Override
+    protected Project mapParams(Map<String, ?> paramMap, Project entity) {
+        return null;
+    }
+
+    @Override
+    protected Project mapRefs(Map<String, ?> refMap, Project entity) {
+        return null;
     }
 }

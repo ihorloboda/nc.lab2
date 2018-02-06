@@ -1,6 +1,5 @@
 DROP TABLE "refs";
 DROP TABLE "params";
-DROP TABLE "grants";
 DROP TABLE "roles";
 DROP TABLE "objects";
 DROP TABLE "attr_binds";
@@ -42,10 +41,10 @@ CREATE TABLE "attr_binds" (
 );
 
 CREATE TABLE "objects" (
-  "object_id"        NUMBER(20, 0)           NOT NULL,
-  "object_version"   NUMBER(20, 0) DEFAULT 0 NOT NULL,
-  "type_id"          NUMBER(20, 0)           NOT NULL,
-  "object_name"      VARCHAR2(100)           NOT NULL,
+  "object_id"        NUMBER(20, 0) NOT NULL,
+  "object_version"   NUMBER(20, 0) DEFAULT 1,
+  "type_id"          NUMBER(20, 0) NOT NULL,
+  "object_name"      VARCHAR2(100) NOT NULL,
   "object_desc"      VARCHAR2(1000),
   "parent_object_id" NUMBER(20, 0) DEFAULT 0,
   CONSTRAINT "objects_pk" PRIMARY KEY ("object_id"),
@@ -69,7 +68,7 @@ CREATE TABLE "refs" (
   "object_id"     NUMBER(20, 0) NOT NULL,
   "attr_id"       NUMBER(20, 0) NOT NULL,
   "ref_object_id" NUMBER(20, 0) NOT NULL,
-  CONSTRAINT "refs_pk" PRIMARY KEY ("object_id", "attr_id"),
+  CONSTRAINT "refs_pk" PRIMARY KEY ("object_id", "attr_id", "ref_object_id"),
   CONSTRAINT "refs_attrs_fk" FOREIGN KEY ("attr_id") REFERENCES "attrs",
   CONSTRAINT "refs_objects_fk_1" FOREIGN KEY ("object_id") REFERENCES "objects",
   CONSTRAINT "refs_objects_fk_2" FOREIGN KEY ("ref_object_id") REFERENCES "objects"
@@ -86,14 +85,12 @@ CREATE TABLE "grants" (
   "role_id"   NUMBER(20, 0) NOT NULL,
   "type_id"   NUMBER(20, 0),
   "object_id" NUMBER(20, 0),
-  "attr_id"   NUMBER(20, 0),
   "read"      NUMBER(1, 0)  NOT NULL,
   "write"     NUMBER(1, 0)  NOT NULL,
-  CONSTRAINT "grants_pk" PRIMARY KEY ("role_id", "type_id", "object_id", "attr_id"),
+  CONSTRAINT "grants_pk" PRIMARY KEY ("role_id", "type_id", "object_id"),
   CONSTRAINT "grants_roles_fk" FOREIGN KEY ("role_id") REFERENCES "roles",
   CONSTRAINT "grants_types_fk" FOREIGN KEY ("type_id") REFERENCES "types",
-  CONSTRAINT "grants_objects_fk" FOREIGN KEY ("object_id") REFERENCES "objects",
-  CONSTRAINT "grants_attrs_fk" FOREIGN KEY ("attr_id") REFERENCES "attrs"
+  CONSTRAINT "grants_objects_fk" FOREIGN KEY ("object_id") REFERENCES "objects"
 );
 
 --Inserting attribute types values
@@ -254,15 +251,27 @@ INSERT INTO "attr_binds" ("type_id", "attr_id") VALUES
   (6, 17);
 
 --Inserting root object
-INSERT INTO "objects" ("object_id", "type_id", "object_name", "object_desc", "parent_object_id") VALUES
-  (0, 0, 'Root', 'Root of all objects for grants', NULL);
+INSERT INTO "objects" ("object_id", "object_version", "type_id", "object_name", "object_desc", "parent_object_id")
+VALUES
+  (0, NULL, 0, 'Root', 'Root of all objects for grants', NULL);
 
 --Inserting qualification constants
-INSERT INTO "objects" ("object_id", "type_id", "object_name", "object_desc", "parent_object_id") VALUES
-  (2, 2, 'JUNIOR', 'The lowest qualification', NULL);
+INSERT INTO "objects" ("object_id", "object_version", "type_id", "object_name", "object_desc", "parent_object_id")
+VALUES
+  (2, NULL, 2, 'JUNIOR', 'The lowest qualification', 0);
 
-INSERT INTO "objects" ("object_id", "type_id", "object_name", "object_desc", "parent_object_id") VALUES
-  (3, 2, 'MIDDLE', 'Middle qualification', NULL);
+INSERT INTO "objects" ("object_id", "object_version", "type_id", "object_name", "object_desc", "parent_object_id")
+VALUES
+  (3, NULL, 2, 'MIDDLE', 'Middle qualification', 0);
 
-INSERT INTO "objects" ("object_id", "type_id", "object_name", "object_desc", "parent_object_id") VALUES
-  (4, 2, 'SENIOR', 'The highest qualification', NULL);
+INSERT INTO "objects" ("object_id", "object_version", "type_id", "object_name", "object_desc", "parent_object_id")
+VALUES
+  (4, NULL, 2, 'SENIOR', 'The highest qualification', 0);
+
+--Inserting admin role and admin grants
+INSERT INTO "roles" ("role_id", "role_name", "role_desc") VALUES
+  (0, 'ADMIN', 'Role which has access to any type and object');
+
+INSERT INTO "objects" ("object_id", "object_version", "type_id", "object_name", "object_desc", "parent_object_id")
+VALUES
+  (1, NULL, 1, 'ADMIN', 'Role which has access to any type and object', 0);

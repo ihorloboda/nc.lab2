@@ -8,7 +8,9 @@ import java.util.List;
 @Data
 public class Task {
     private Long id;
+    private Long version;
     private String name;
+    private String desc;
     private Sprint sprint;
     //TODO make these fields as time intervals
     private OffsetDateTime estimate;
