@@ -276,3 +276,25 @@ INSERT INTO "roles" ("role_id", "role_name", "role_desc") VALUES
 INSERT INTO "objects" ("object_id", "object_version", "type_id", "object_name", "object_desc", "parent_object_id")
 VALUES
   (1, NULL, 1, 'ADMIN', 'Role which has access to any type and object', 0);
+
+--Inserting test roles
+INSERT INTO "roles" ("role_id", "role_name", "role_desc") VALUES
+  (11, 'TEST 1', 'Test role 1');
+
+INSERT INTO "objects" ("object_id", "object_version", "type_id", "object_name", "object_desc", "parent_object_id")
+VALUES
+  (11, NULL, 1, 'TEST 1', 'Test role 1', 0);
+
+INSERT INTO "roles" ("role_id", "role_name", "role_desc") VALUES
+  (12, 'TEST 2', 'Test role 2');
+
+INSERT INTO "objects" ("object_id", "object_version", "type_id", "object_name", "object_desc", "parent_object_id")
+VALUES
+  (12, NULL, 1, 'TEST 2', 'Test role 2', 0);
+
+INSERT INTO "roles" ("role_id", "role_name", "role_desc") VALUES
+  (13, 'TEST 3', 'Test role 3');
+
+INSERT INTO "objects" ("object_id", "object_version", "type_id", "object_name", "object_desc", "parent_object_id")
+VALUES
+  (13, NULL, 1, 'TEST 3', 'Test role 3', 0);

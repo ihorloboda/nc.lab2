@@ -6,6 +6,7 @@ import com.nc.kpi.persistence.metamodel.rows.Ref;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -16,12 +17,12 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import static lombok.AccessLevel.PUBLIC;
@@ -29,8 +30,8 @@ import static lombok.AccessLevel.PUBLIC;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class AbstractDao<T> {
     //bounds for random number which added to new object id
-    private final Integer MAX_EXCLUSIVE_BOUND = 1000;
-    private final Integer MIN_INCLUSIVE_BOUND = 100;
+    private final int MAX_EXCLUSIVE_BOUND = 1000;
+    private final int MIN_INCLUSIVE_BOUND = 100;
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -38,33 +39,33 @@ public abstract class AbstractDao<T> {
     protected final Long DEFAULT_OBJECT_VERSION = 1L;
 
     //metamodel type constants
-    protected final Integer TYPE_ROLE = 1;
-    protected final Integer TYPE_QUALIFICATION = 2;
-    protected final Integer TYPE_USER = 3;
-    protected final Integer TYPE_PROJECT = 4;
-    protected final Integer TYPE_SPRINT = 5;
-    protected final Integer TYPE_TASK = 6;
+    protected final int TYPE_ROLE = 1;
+    protected final int TYPE_QUALIFICATION = 2;
+    protected final int TYPE_USER = 3;
+    protected final int TYPE_PROJECT = 4;
+    protected final int TYPE_SPRINT = 5;
+    protected final int TYPE_TASK = 6;
 
     //metamodel attribute constants
-    protected final Integer ATTR_BIO = 1;
-    protected final Integer ATTR_ROLES = 2;
-    protected final Integer ATTR_QUALIFICATION = 3;
-    protected final Integer ATTR_START_DATE = 4;
-    protected final Integer ATTR_END_DATE = 5;
-    protected final Integer ATTR_ACTIVE = 6;
-    protected final Integer ATTR_MANAGER = 7;
-    protected final Integer ATTR_CUSTOMER = 8;
-    protected final Integer ATTR_PROJECT = 9;
-    protected final Integer ATTR_PREV_SPRINT = 10;
-    protected final Integer ATTR_SPRINT = 11;
-    protected final Integer ATTR_ESTIMATE = 12;
-    protected final Integer ATTR_ACTUAL = 13;
-    protected final Integer ATTR_OVERTIME = 14;
-    protected final Integer ATTR_SUBTASKS = 15;
-    protected final Integer ATTR_PREV_TASKS = 16;
-    protected final Integer ATTR_EMPLOYEE = 17;
+    protected final int ATTR_BIO = 1;
+    protected final int ATTR_ROLES = 2;
+    protected final int ATTR_QUALIFICATION = 3;
+    protected final int ATTR_START_DATE = 4;
+    protected final int ATTR_END_DATE = 5;
+    protected final int ATTR_ACTIVE = 6;
+    protected final int ATTR_MANAGER = 7;
+    protected final int ATTR_CUSTOMER = 8;
+    protected final int ATTR_PROJECT = 9;
+    protected final int ATTR_PREV_SPRINT = 10;
+    protected final int ATTR_SPRINT = 11;
+    protected final int ATTR_ESTIMATE = 12;
+    protected final int ATTR_ACTUAL = 13;
+    protected final int ATTR_OVERTIME = 14;
+    protected final int ATTR_SUBTASKS = 15;
+    protected final int ATTR_PREV_TASKS = 16;
+    protected final int ATTR_EMPLOYEE = 17;
 
-    //pathes to sql statements
+    //paths to sql statements
     private final String STATEMENTS_PATH = "src/main/resources/db/statements/";
 
     protected final String SQL_OBJECT_ADD_PATH = "objects/add.sql";
@@ -72,10 +73,10 @@ public abstract class AbstractDao<T> {
     protected final String SQL_OBJECT_FIND_PATH = "objects/find.sql";
     protected final String SQL_OBJECT_UPDATE_PATH = "objects/update.sql";
 
-    protected final String SQL_PARAM_ADD_PATH = "params/text/add.sql";
+    protected final String SQL_PARAM_ADD_PATH = "params/add.sql";
     protected final String SQL_PARAM_DELETE_PATH = "params/delete.sql";
-    protected final String SQL_PARAM_FIND_PATH = "params/text/find.sql";
-    protected final String SQL_PARAM_UPDATE_PATH = "params/text/update.sql";
+    protected final String SQL_PARAM_FIND_PATH = "params/find.sql";
+    protected final String SQL_PARAM_UPDATE_PATH = "params/update.sql";
 
     protected final String SQL_REF_ADD_PATH = "refs/add.sql";
     protected final String SQL_REF_DELETE_ONE_PATH = "refs/deleteOne.sql";
@@ -114,11 +115,11 @@ public abstract class AbstractDao<T> {
     protected final String READ = "read";
     protected final String WRITE = "write";
 
-    protected abstract T mapObject(MetamodelObject object);
+    protected abstract T mapObject(@Nullable MetamodelObject object);
 
-    protected abstract T mapParams(Param param, T entity);
+    protected abstract void mapParams(@Nullable List<Param> params, T entity);
 
-    protected abstract T mapRefs(Ref ref, T entity);
+    protected abstract void mapRefs(@Nullable List<Ref> refs, T entity);
 
     protected String loadSqlStatement(String path) {
         StringBuilder stringBuilder = new StringBuilder();
@@ -150,7 +151,6 @@ public abstract class AbstractDao<T> {
         }
     }
 
-    //TODO remake when it will be needed
     protected <E> List<E> findMultiple(String sql, RowMapper<E> rowMapper, Object... params) {
         return jdbcTemplate.query(sql, rowMapper, params);
     }
@@ -165,19 +165,6 @@ public abstract class AbstractDao<T> {
         ).concat(String.valueOf(random.nextInt(MAX_EXCLUSIVE_BOUND - MIN_INCLUSIVE_BOUND) + MIN_INCLUSIVE_BOUND));
         return Long.valueOf(id);
     }
-
-//    @NoArgsConstructor(access = PUBLIC)
-//    protected class ObjectMapRowMapper implements RowMapper<Map<String, ?>> {
-//        @Override
-//        public Map<String, ?> mapRow(ResultSet rs, int rowNum) throws SQLException {
-//            Map<String, Object> row = new HashMap<>();
-//            row.put(OBJECT_ID, rs.getLong(OBJECT_ID));
-//            row.put(OBJECT_VERSION, rs.getLong(OBJECT_VERSION));
-//            row.put(OBJECT_NAME, rs.getString(OBJECT_NAME));
-//            row.put(OBJECT_DESC, rs.getString(OBJECT_DESC));
-//            return row;
-//        }
-//    }
 
     @NoArgsConstructor(access = PUBLIC)
     protected class ObjectRowMapper implements RowMapper<MetamodelObject> {
@@ -212,10 +199,17 @@ public abstract class AbstractDao<T> {
             param.setObjectId(rs.getLong(OBJECT_ID));
             param.setAttrId(rs.getLong(ATTR_ID));
             param.setBooleanVal(rs.getBoolean(BOOLEAN_VAL));
-            param.setDateVal(OffsetDateTime.ofInstant(rs.getTimestamp(DATE_VAL).toInstant(), ZoneId.systemDefault()));
             param.setNumberVal(rs.getLong(NUMBER_VAL));
             param.setTextVal(rs.getString(TEXT_VAL));
+            param.setDateVal(instantiateDate(rs.getTimestamp(DATE_VAL)));
             return param;
         }
+    }
+
+    private OffsetDateTime instantiateDate(Timestamp timestamp) {
+        if (timestamp != null) {
+            return OffsetDateTime.ofInstant(timestamp.toInstant(), ZoneId.systemDefault());
+        }
+        return null;
     }
 }

@@ -18,7 +18,7 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
 public class QualificationDaoTest extends CrudDaoTest<Qualification> {
     @Autowired
     @Setter
-    private QualificationDao dao;
+    private QualificationDao qualificationDao;
 
     @Override
     public void before() {
@@ -34,38 +34,38 @@ public class QualificationDaoTest extends CrudDaoTest<Qualification> {
         forFind.setDesc(FOR_FIND_DESC);
         forUpdate.setDesc(FOR_UPDATE_DESC);
         forDelete.setDesc(FOR_DELETE_DESC);
-        dao.add(forFind);
-        dao.add(forUpdate);
-        dao.add(forDelete);
+        qualificationDao.add(forFind);
+        qualificationDao.add(forUpdate);
+        qualificationDao.add(forDelete);
     }
 
     @Override
     public void after() {
-        dao.delete(forAdd.getId());
-        dao.delete(forFind.getId());
-        dao.delete(forUpdate.getId());
-        dao.delete(forDelete.getId());
+        qualificationDao.delete(forAdd.getId());
+        qualificationDao.delete(forFind.getId());
+        qualificationDao.delete(forUpdate.getId());
+        qualificationDao.delete(forDelete.getId());
     }
 
     @Override
     public void find() {
         Qualification expected = forFind;
-        Qualification actual = dao.find(forFind.getId());
+        Qualification actual = qualificationDao.find(forFind.getId());
         Assert.assertEquals(expected, actual);
     }
 
     @Override
     public void add() {
         Qualification expected = forAdd;
-        dao.add(expected);
-        Qualification actual = dao.find(expected.getId());
+        qualificationDao.add(expected);
+        Qualification actual = qualificationDao.find(expected.getId());
         Assert.assertEquals(expected, actual);
     }
 
     @Override
     public void delete() {
-        dao.delete(forDelete.getId());
-        Assert.assertNull(dao.find(forDelete.getId()));
+        qualificationDao.delete(forDelete.getId());
+        Assert.assertNull(qualificationDao.find(forDelete.getId()));
     }
 
     @Override
@@ -73,8 +73,8 @@ public class QualificationDaoTest extends CrudDaoTest<Qualification> {
         final String TEST_NAME = "updated name";
         forUpdate.setName(TEST_NAME);
         Qualification expected = forUpdate;
-        dao.update(forUpdate);
-        Qualification actual = dao.find(forUpdate.getId());
+        qualificationDao.update(forUpdate);
+        Qualification actual = qualificationDao.find(forUpdate.getId());
         Assert.assertEquals(expected, actual);
     }
 }

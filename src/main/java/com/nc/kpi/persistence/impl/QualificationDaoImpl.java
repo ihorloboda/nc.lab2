@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public class QualificationDaoImpl extends AbstractDao<Qualification> implements QualificationDao {
     @Autowired
@@ -55,12 +57,13 @@ public class QualificationDaoImpl extends AbstractDao<Qualification> implements 
     }
 
     @Override
-    protected Qualification mapParams(Param param, Qualification entity) {
+    protected void mapParams(List<Param> params, Qualification entity) {
+
         throw new UnsupportedOperationException("QualificationDao mapParams");
     }
 
     @Override
-    protected Qualification mapRefs(Ref ref, Qualification entity) {
+    protected void mapRefs(List<Ref> refs, Qualification entity) {
         throw new UnsupportedOperationException("QualificationDao mapRefs");
     }
 }

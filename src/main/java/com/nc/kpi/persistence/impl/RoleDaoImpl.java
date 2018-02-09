@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 @Repository
 public class RoleDaoImpl extends AbstractDao<Role> implements RoleDao {
@@ -95,12 +96,12 @@ public class RoleDaoImpl extends AbstractDao<Role> implements RoleDao {
     }
 
     @Override
-    protected Role mapParams(Param param, Role entity) {
+    protected void mapParams(List<Param> params, Role entity) {
         throw new UnsupportedOperationException("RoleDao mapParams");
     }
 
     @Override
-    protected Role mapRefs(Ref ref, Role entity) {
+    protected void mapRefs(List<Ref> refs, Role entity) {
         throw new UnsupportedOperationException("RoleDao mapRefs");
     }
 }

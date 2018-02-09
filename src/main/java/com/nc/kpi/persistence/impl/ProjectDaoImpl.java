@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Map;
 
 @Repository
@@ -45,12 +46,12 @@ public class ProjectDaoImpl extends AbstractDao<Project> implements ProjectDao {
     }
 
     @Override
-    protected Project mapParams(Param param, Project entity) {
-        return null;
+    protected void mapParams(List<Param> params, Project entity) {
+
     }
 
     @Override
-    protected Project mapRefs(Ref ref, Project entity) {
-        return null;
+    protected void mapRefs(List<Ref> refs, Project entity) {
+
     }
 }

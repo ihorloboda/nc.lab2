@@ -1,11 +1,13 @@
 package com.nc.kpi.persistence;
 
+import org.jetbrains.annotations.NotNull;
+
 public interface CrudDao<T> {
-    T find(Long id);
+    T find(@NotNull Long id);
 
-    void add(T entity);
+    void add(@NotNull T entity);
 
-    void update(T entity);
+    void update(@NotNull T entity);
 
-    void delete(Long id);
+    void delete(@NotNull Long id);
 }

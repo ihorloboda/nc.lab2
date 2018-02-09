@@ -21,6 +21,14 @@ public abstract class CrudDaoTest<T> {
     protected final String FOR_UPDATE_DESC = "for update desc";
     protected final String FOR_DELETE_DESC = "for delete desc";
 
+    protected final long JUNIOR_QUALIFICATION_ID = 2;
+    protected final long MIDDLE_QUALIFICATION_ID = 3;
+    protected final long SENIOR_QUALIFICATION_ID = 4;
+
+    protected final long TEST_ROLE_1_ID = 11;
+    protected final long TEST_ROLE_2_ID = 12;
+    protected final long TEST_ROLE_3_ID = 13;
+
     @Before
     public abstract void before();
 
