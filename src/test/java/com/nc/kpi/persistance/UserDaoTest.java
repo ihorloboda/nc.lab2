@@ -114,10 +114,10 @@ public class UserDaoTest extends CrudDaoTest<User> {
 
     @Override
     public void after() {
-        userDao.delete(forAdd.getId());
         userDao.delete(forFind.getId());
         userDao.delete(forUpdate.getId());
         userDao.delete(forDelete.getId());
+        if (forAdd.getId() != null) userDao.delete(forAdd.getId());
     }
 
     @Override

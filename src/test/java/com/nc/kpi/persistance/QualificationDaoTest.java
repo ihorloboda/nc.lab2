@@ -41,7 +41,7 @@ public class QualificationDaoTest extends CrudDaoTest<Qualification> {
 
     @Override
     public void after() {
-        qualificationDao.delete(forAdd.getId());
+        if (forAdd.getId() != null) qualificationDao.delete(forAdd.getId());
         qualificationDao.delete(forFind.getId());
         qualificationDao.delete(forUpdate.getId());
         qualificationDao.delete(forDelete.getId());

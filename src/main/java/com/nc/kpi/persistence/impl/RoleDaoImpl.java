@@ -6,6 +6,7 @@ import com.nc.kpi.persistence.RoleDao;
 import com.nc.kpi.persistence.metamodel.rows.MetamodelObject;
 import com.nc.kpi.persistence.metamodel.rows.Param;
 import com.nc.kpi.persistence.metamodel.rows.Ref;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -31,7 +32,7 @@ public class RoleDaoImpl extends AbstractDao<Role> implements RoleDao {
 
     @Override
     @Transactional
-    public Role find(Long id) {
+    public Role find(@NotNull Long id) {
         String sqlRoles = loadSqlStatement(SQL_ROLE_FIND_PATH);
         String sqlObjects = loadSqlStatement(SQL_OBJECT_FIND_PATH);
         Role roleFromRoles = mapObject(findOne(sqlRoles, new roleRowMapper(), id));
@@ -46,7 +47,7 @@ public class RoleDaoImpl extends AbstractDao<Role> implements RoleDao {
 
     @Override
     @Transactional
-    public void add(Role entity) {
+    public void add(@NotNull Role entity) {
         String sqlRoles = loadSqlStatement(SQL_ROLE_ADD_PATH);
         String sqlObjects = loadSqlStatement(SQL_OBJECT_ADD_PATH);
         entity.setId(generateId(TYPE_ROLE));
@@ -56,7 +57,7 @@ public class RoleDaoImpl extends AbstractDao<Role> implements RoleDao {
 
     @Override
     @Transactional
-    public void update(Role entity) {
+    public void update(@NotNull Role entity) {
         String sqlRoles = loadSqlStatement(SQL_ROLE_UPDATE_PATH);
         String sqlObjects = loadSqlStatement(SQL_OBJECT_UPDATE_PATH);
         executeUpdate(sqlRoles, entity.getName(), entity.getDesc(), entity.getId());
@@ -65,7 +66,7 @@ public class RoleDaoImpl extends AbstractDao<Role> implements RoleDao {
 
     @Override
     @Transactional
-    public void delete(Long id) {
+    public void delete(@NotNull Long id) {
         String sqlRoles = loadSqlStatement(SQL_ROLE_DELETE_PATH);
         String sqlObjects = loadSqlStatement(SQL_OBJECT_DELETE_PATH);
         executeUpdate(sqlRoles, id);

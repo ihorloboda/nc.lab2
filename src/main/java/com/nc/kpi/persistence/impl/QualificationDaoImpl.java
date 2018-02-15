@@ -6,6 +6,7 @@ import com.nc.kpi.persistence.QualificationDao;
 import com.nc.kpi.persistence.metamodel.rows.MetamodelObject;
 import com.nc.kpi.persistence.metamodel.rows.Param;
 import com.nc.kpi.persistence.metamodel.rows.Ref;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -20,26 +21,26 @@ public class QualificationDaoImpl extends AbstractDao<Qualification> implements 
     }
 
     @Override
-    public Qualification find(Long id) {
+    public Qualification find(@NotNull Long id) {
         String sql = loadSqlStatement(SQL_OBJECT_FIND_PATH);
         return mapObject(findOne(sql, new ObjectRowMapper(), id));
     }
 
     @Override
-    public void add(Qualification entity) {
+    public void add(@NotNull Qualification entity) {
         String sql = loadSqlStatement(SQL_OBJECT_ADD_PATH);
         entity.setId(generateId(TYPE_QUALIFICATION));
         executeUpdate(sql, entity.getId(), null, TYPE_QUALIFICATION, entity.getName(), entity.getDesc());
     }
 
     @Override
-    public void update(Qualification entity) {
+    public void update(@NotNull Qualification entity) {
         String sql = loadSqlStatement(SQL_OBJECT_UPDATE_PATH);
         executeUpdate(sql, null, entity.getName(), entity.getDesc(), entity.getId());
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(@NotNull Long id) {
         String sql = loadSqlStatement(SQL_OBJECT_DELETE_PATH);
         executeUpdate(sql, id);
     }

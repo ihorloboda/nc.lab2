@@ -41,7 +41,7 @@ public class RoleDaoTest extends CrudDaoTest<Role> {
 
     @Override
     public void after() {
-        roleDao.delete(forAdd.getId());
+        if (forAdd.getId() != null) roleDao.delete(forAdd.getId());
         roleDao.delete(forFind.getId());
         roleDao.delete(forUpdate.getId());
         roleDao.delete(forDelete.getId());
