@@ -1,15 +1,17 @@
 package com.nc.kpi.persistence;
 
-import com.nc.kpi.persistence.metamodel.rows.MetamodelObject;
-import com.nc.kpi.persistence.metamodel.rows.Param;
-import com.nc.kpi.persistence.metamodel.rows.Ref;
+import com.nc.kpi.persistence.metamodel.rows.ObjectRow;
+import com.nc.kpi.persistence.metamodel.rows.ParamRow;
+import com.nc.kpi.persistence.metamodel.rows.RefRow;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -28,7 +30,7 @@ import java.util.Random;
 import static lombok.AccessLevel.PUBLIC;
 
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class AbstractDao<T> {
+public abstract class AbstractDao<T> implements CrudDao<T> {
     //bounds for random number which added to new object id
     private final int MAX_EXCLUSIVE_BOUND = 1000;
     private final int MIN_INCLUSIVE_BOUND = 100;
@@ -115,11 +117,93 @@ public abstract class AbstractDao<T> {
     protected final String READ = "read";
     protected final String WRITE = "write";
 
-    protected abstract T mapObject(@Nullable MetamodelObject object);
 
-    protected abstract void mapParams(@Nullable List<Param> params, T entity);
+    //TODO check does it work?
+    @Override
+    @Transactional
+    public void add(@NotNull T entity) {
+        addObject(entity);
+        addParams(entity);
+        addRefs(entity);
+    }
 
-    protected abstract void mapRefs(@Nullable List<Ref> refs, T entity);
+    @Override
+    @Transactional
+    public T find(@NotNull Long id) {
+        T entity = findObject(id);
+        findParams(id, entity);
+        findRefs(id, entity);
+        return entity;
+    }
+
+    @Override
+    @Transactional
+    public void update(@NotNull T entity) {
+        updateObject(entity);
+        updateParams(entity);
+        updateRefs(entity);
+        updateVersion(entity);
+    }
+
+    @Override
+    @Transactional
+    public void delete(@NotNull Long id) {
+        deleteParams(id);
+        deleteRefs(id);
+        deleteObject(id);
+    }
+
+    protected abstract void addObject(T entity);
+
+    protected abstract void addParams(T entity);
+
+    protected abstract void addRefs(T entity);
+
+    protected abstract void updateObject(T entity);
+
+    protected abstract void updateParams(T entity);
+
+    protected abstract void updateRefs(T entity);
+
+    protected abstract void updateVersion(T entity);
+
+    protected T findObject(Long id) {
+        String sqlObjectFind = loadSqlStatement(SQL_OBJECT_FIND_PATH);
+        T entity = mapObject(findOne(sqlObjectFind, new ObjectRowMapper(), id));
+        return entity;
+    }
+
+    protected void findParams(Long id, T entity) {
+        String sqlParamsFind = loadSqlStatement(SQL_PARAM_FIND_PATH);
+        mapParams(findMultiple(sqlParamsFind, new ParamRowMapper(), id), entity);
+
+    }
+
+    protected void findRefs(Long id, T entity) {
+        String sqlRefsFind = loadSqlStatement(SQL_REF_FIND_PATH);
+        mapRefs(findMultiple(sqlRefsFind, new RefRowMapper(), id), entity);
+    }
+
+    protected void deleteObject(Long id) {
+        String sqlObjectDelete = loadSqlStatement(SQL_OBJECT_DELETE_PATH);
+        executeUpdate(sqlObjectDelete, id);
+    }
+
+    protected void deleteParams(Long id) {
+        String sqlParamDelete = loadSqlStatement(SQL_PARAM_DELETE_PATH);
+        executeUpdate(sqlParamDelete, id);
+    }
+
+    protected void deleteRefs(Long id) {
+        String sqlRefDelete = loadSqlStatement(SQL_REF_DELETE_ALL_PATH);
+        executeUpdate(sqlRefDelete, id);
+    }
+
+    protected abstract T mapObject(@Nullable ObjectRow object);
+
+    protected abstract void mapParams(@Nullable List<ParamRow> params, T entity);
+
+    protected abstract void mapRefs(@Nullable List<RefRow> refs, T entity);
 
     protected String loadSqlStatement(String path) {
         StringBuilder stringBuilder = new StringBuilder();
@@ -167,10 +251,10 @@ public abstract class AbstractDao<T> {
     }
 
     @NoArgsConstructor(access = PUBLIC)
-    protected class ObjectRowMapper implements RowMapper<MetamodelObject> {
+    protected class ObjectRowMapper implements RowMapper<ObjectRow> {
         @Override
-        public MetamodelObject mapRow(ResultSet rs, int rowNum) throws SQLException {
-            MetamodelObject object = new MetamodelObject();
+        public ObjectRow mapRow(ResultSet rs, int rowNum) throws SQLException {
+            ObjectRow object = new ObjectRow();
             object.setId(rs.getLong(OBJECT_ID));
             object.setVersion(rs.getLong(OBJECT_VERSION));
             object.setName(rs.getString(OBJECT_NAME));
@@ -180,10 +264,10 @@ public abstract class AbstractDao<T> {
     }
 
     @NoArgsConstructor(access = PUBLIC)
-    protected class RefRowMapper implements RowMapper<Ref> {
+    protected class RefRowMapper implements RowMapper<RefRow> {
         @Override
-        public Ref mapRow(ResultSet rs, int rowNum) throws SQLException {
-            Ref ref = new Ref();
+        public RefRow mapRow(ResultSet rs, int rowNum) throws SQLException {
+            RefRow ref = new RefRow();
             ref.setObjectId(rs.getLong(OBJECT_ID));
             ref.setAttrId(rs.getLong(ATTR_ID));
             ref.setRefId(rs.getLong(REF_OBJECT_ID));
@@ -192,10 +276,10 @@ public abstract class AbstractDao<T> {
     }
 
     @NoArgsConstructor(access = PUBLIC)
-    protected class ParamRowMapper implements RowMapper<Param> {
+    protected class ParamRowMapper implements RowMapper<ParamRow> {
         @Override
-        public Param mapRow(ResultSet rs, int rowNum) throws SQLException {
-            Param param = new Param();
+        public ParamRow mapRow(ResultSet rs, int rowNum) throws SQLException {
+            ParamRow param = new ParamRow();
             param.setObjectId(rs.getLong(OBJECT_ID));
             param.setAttrId(rs.getLong(ATTR_ID));
             param.setBooleanVal(rs.getBoolean(BOOLEAN_VAL));

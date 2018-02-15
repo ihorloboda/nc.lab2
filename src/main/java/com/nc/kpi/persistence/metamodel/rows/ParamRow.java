@@ -5,7 +5,7 @@ import lombok.Data;
 import java.time.OffsetDateTime;
 
 @Data
-public class Param {
+public class ParamRow {
     private Long objectId;
     private Long attrId;
     private Long numberVal;

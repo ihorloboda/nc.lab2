@@ -1,17 +1,20 @@
 package com.nc.kpi.persistence.impl;
 
 import com.nc.kpi.entities.Project;
+import com.nc.kpi.entities.User;
 import com.nc.kpi.persistence.AbstractDao;
 import com.nc.kpi.persistence.ProjectDao;
-import com.nc.kpi.persistence.metamodel.rows.MetamodelObject;
-import com.nc.kpi.persistence.metamodel.rows.Param;
-import com.nc.kpi.persistence.metamodel.rows.Ref;
+import com.nc.kpi.persistence.metamodel.rows.ObjectRow;
+import com.nc.kpi.persistence.metamodel.rows.ParamRow;
+import com.nc.kpi.persistence.metamodel.rows.RefRow;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Repository
 public class ProjectDaoImpl extends AbstractDao<Project> implements ProjectDao {
@@ -21,37 +24,123 @@ public class ProjectDaoImpl extends AbstractDao<Project> implements ProjectDao {
     }
 
     @Override
+    @Transactional
     public Project find(Long id) {
         return null;
     }
 
     @Override
+    @Transactional
     public void add(Project entity) {
-
+        addObject(entity);
+        addParams(entity);
+        addRefs(entity);
     }
 
     @Override
+    protected void addObject(Project entity) {
+        String sqlObjectAdd = loadSqlStatement(SQL_OBJECT_ADD_PATH);
+        entity.setId(generateId(TYPE_PROJECT));
+        entity.setVersion(DEFAULT_OBJECT_VERSION);
+        executeUpdate(sqlObjectAdd, entity.getId(), entity.getVersion(), TYPE_PROJECT, entity.getName(), entity.getDesc());
+    }
+
+    @Override
+    protected void addParams(Project entity) {
+        String sqlParamAdd = loadSqlStatement(SQL_PARAM_ADD_PATH);
+        List<Object[]> params = new ArrayList<>(3);
+        params.add(new Object[]{entity.getId(), ATTR_ACTIVE, null, null, null, entity.getActive()});
+        params.add(new Object[]{entity.getId(), ATTR_START_DATE, null, null, entity.getStartDate(), null});
+        params.add(new Object[]{entity.getId(), ATTR_START_DATE, null, null, entity.getEndDate(), null});
+        executeBatchUpdate(sqlParamAdd, params);
+    }
+
+    @Override
+    protected void addRefs(Project entity) {
+        String sqlRefAdd = loadSqlStatement(SQL_REF_ADD_PATH);
+        List<Object[]> refs = new ArrayList<>(2);
+        refs.add(new Object[]{entity.getId(), ATTR_CUSTOMER, entity.getCustomer().getId()});
+        refs.add(new Object[]{entity.getId(), ATTR_MANAGER, entity.getManager().getId()});
+        executeBatchUpdate(sqlRefAdd, refs);
+    }
+
+    @Override
+    @Transactional
     public void update(Project entity) {
 
     }
 
     @Override
+    protected void updateObject(Project entity) {
+
+    }
+
+    @Override
+    protected void updateParams(Project entity) {
+
+    }
+
+    @Override
+    protected void updateRefs(Project entity) {
+
+    }
+
+    @Override
+    protected void updateVersion(Project entity) {
+
+    }
+
+    @Override
+    @Transactional
     public void delete(Long id) {
 
     }
 
     @Override
-    protected Project mapObject(MetamodelObject object) {
-        return null;
+    protected Project mapObject(@Nullable ObjectRow object) {
+        if (object == null) return null;
+        Project project = new Project();
+        project.setId(object.getId());
+        project.setVersion(object.getVersion());
+        project.setName(object.getName());
+        project.setDesc(object.getDesc());
+        return project;
     }
 
     @Override
-    protected void mapParams(List<Param> params, Project entity) {
-
+    protected void mapParams(@Nullable List<ParamRow> params, Project entity) {
+        if (params.size() == 0) return;
+        params.stream().forEach(param -> {
+            switch (param.getAttrId().intValue()) {
+                case ATTR_ACTIVE:
+                    entity.setActive(param.getBooleanVal());
+                    break;
+                case ATTR_START_DATE:
+                    entity.setStartDate(param.getDateVal());
+                    break;
+                case ATTR_END_DATE:
+                    entity.setEndDate(param.getDateVal());
+                    break;
+            }
+        });
     }
 
     @Override
-    protected void mapRefs(List<Ref> refs, Project entity) {
-
+    protected void mapRefs(@Nullable List<RefRow> refs, Project entity) {
+        if (refs.size() == 0) return;
+        refs.stream().forEach(ref -> {
+            switch (ref.getAttrId().intValue()) {
+                case ATTR_MANAGER:
+                    User manager = new User();
+                    manager.setId(ref.getRefId());
+                    entity.setManager(manager);
+                    break;
+                case ATTR_CUSTOMER:
+                    User customer = new User();
+                    customer.setId(ref.getRefId());
+                    entity.setCustomer(customer);
+                    break;
+            }
+        });
     }
 }
