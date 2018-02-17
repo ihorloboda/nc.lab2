@@ -44,9 +44,9 @@ public class ProjectDaoImpl extends AbstractDao<Project> implements ProjectDao {
     protected void addParams(Project entity) {
         String sqlParamAdd = loadSqlStatement(SQL_PARAM_ADD_PATH);
         List<Object[]> params = new ArrayList<>(3);
-        params.add(new Object[]{entity.getId(), ATTR_ACTIVE, null, null, null, entity.getActive()});
-        params.add(new Object[]{entity.getId(), ATTR_START_DATE, null, null, Timestamp.from(entity.getStartDate().toInstant()), null});
-        params.add(new Object[]{entity.getId(), ATTR_END_DATE, null, null, Timestamp.from(entity.getEndDate().toInstant()), null});
+        params.add(new Object[]{entity.getId(), ATTR_ACTIVE, null, null, null, null, entity.getActive()});
+        params.add(new Object[]{entity.getId(), ATTR_START_DATE, null, null, Timestamp.from(entity.getStartDate().toInstant()), null, null});
+        params.add(new Object[]{entity.getId(), ATTR_END_DATE, null, null, Timestamp.from(entity.getEndDate().toInstant()), null, null});
         executeBatchUpdate(sqlParamAdd, params);
     }
 
@@ -72,9 +72,9 @@ public class ProjectDaoImpl extends AbstractDao<Project> implements ProjectDao {
     protected void updateParams(Project entity) {
         String sql = loadSqlStatement(SQL_PARAM_UPDATE_PATH);
         List<Object[]> batchArgs = new ArrayList<>();
-        batchArgs.add(new Object[]{null, null, null, entity.getActive(), entity.getId(), ATTR_ACTIVE,});
-        batchArgs.add(new Object[]{null, null, Timestamp.from(entity.getStartDate().toInstant()), null, entity.getId(), ATTR_START_DATE});
-        batchArgs.add(new Object[]{null, null, Timestamp.from(entity.getEndDate().toInstant()), null, entity.getId(), ATTR_END_DATE});
+        batchArgs.add(new Object[]{null, null, null, null, entity.getActive(), entity.getId(), ATTR_ACTIVE,});
+        batchArgs.add(new Object[]{null, null, Timestamp.from(entity.getStartDate().toInstant()), null, null, entity.getId(), ATTR_START_DATE});
+        batchArgs.add(new Object[]{null, null, Timestamp.from(entity.getEndDate().toInstant()), null, null, entity.getId(), ATTR_END_DATE});
         executeBatchUpdate(sql, batchArgs);
     }
 

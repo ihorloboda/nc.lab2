@@ -34,7 +34,7 @@ public class SprintDaoImpl extends AbstractDao<Sprint> implements SprintDao {
     @Override
     protected void addParams(Sprint entity) {
         String sql = loadSqlStatement(SQL_PARAM_ADD_PATH);
-        executeUpdate(sql, entity.getId(), ATTR_ACTIVE, null, null, null, entity.getActive());
+        executeUpdate(sql, entity.getId(), ATTR_ACTIVE, null, null, null, null, entity.getActive());
     }
 
     @Override
@@ -56,7 +56,7 @@ public class SprintDaoImpl extends AbstractDao<Sprint> implements SprintDao {
     @Override
     protected void updateParams(Sprint entity) {
         String sql = loadSqlStatement(SQL_PARAM_UPDATE_PATH);
-        executeUpdate(sql, null, null, null, entity.getActive(), entity.getId(), ATTR_ACTIVE);
+        executeUpdate(sql, null, null, null, null, entity.getActive(), entity.getId(), ATTR_ACTIVE);
     }
 
     @Override

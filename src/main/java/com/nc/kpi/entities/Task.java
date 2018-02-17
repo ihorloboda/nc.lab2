@@ -2,6 +2,7 @@ package com.nc.kpi.entities;
 
 import lombok.Data;
 
+import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -11,12 +12,11 @@ public class Task {
     private Long version;
     private String name;
     private String desc;
-    private Sprint sprint;
-    //TODO make these fields as time intervals
     private OffsetDateTime estimate;
     private OffsetDateTime actual;
-    private OffsetDateTime overtime;
+    private Duration overtime;
     private Boolean active;
+    private Sprint sprint;
     private Qualification qualification;
     //TODO decide what structure is needed
     private List<Task> subtasks;

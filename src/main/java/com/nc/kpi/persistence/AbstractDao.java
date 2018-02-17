@@ -20,6 +20,7 @@ import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -107,6 +108,7 @@ public abstract class AbstractDao<T> implements CrudDao<T> {
     protected final String NUMBER_VAL = "number_val";
     protected final String TEXT_VAL = "text_val";
     protected final String DATE_VAL = "date_val";
+    protected final String INTERVAL_VAL = "interval_val";
     protected final String BOOLEAN_VAL = "boolean_val";
 
     protected final String REF_OBJECT_ID = "ref_object_id";
@@ -287,14 +289,18 @@ public abstract class AbstractDao<T> implements CrudDao<T> {
             param.setNumberVal(rs.getLong(NUMBER_VAL));
             param.setTextVal(rs.getString(TEXT_VAL));
             param.setDateVal(instantiateDate(rs.getTimestamp(DATE_VAL)));
+            param.setIntervalVal(instantiateInterval(rs.getLong(INTERVAL_VAL)));
             return param;
         }
-    }
 
-    private OffsetDateTime instantiateDate(Timestamp timestamp) {
-        if (timestamp != null) {
-            return OffsetDateTime.ofInstant(timestamp.toInstant(), ZoneId.systemDefault());
+        private Duration instantiateInterval(long nanos) {
+            if (nanos != 0) return Duration.ofNanos(nanos);
+            return null;
         }
-        return null;
+
+        private OffsetDateTime instantiateDate(Timestamp timestamp) {
+            if (timestamp != null) return OffsetDateTime.ofInstant(timestamp.toInstant(), ZoneId.systemDefault());
+            return null;
+        }
     }
 }

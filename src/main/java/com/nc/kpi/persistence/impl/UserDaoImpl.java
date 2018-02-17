@@ -41,7 +41,7 @@ public class UserDaoImpl extends AbstractDao<User> implements UserDao {
     @Override
     protected void addParams(User entity) {
         String sqlParamAdd = loadSqlStatement(SQL_PARAM_ADD_PATH);
-        executeUpdate(sqlParamAdd, entity.getId(), ATTR_BIO, null, entity.getBio(), null, null);
+        executeUpdate(sqlParamAdd, entity.getId(), ATTR_BIO, null, entity.getBio(), null, null, null);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class UserDaoImpl extends AbstractDao<User> implements UserDao {
     @Override
     protected void updateParams(User entity) {
         String sqlParamUpdate = loadSqlStatement(SQL_PARAM_UPDATE_PATH);
-        executeUpdate(sqlParamUpdate, null, entity.getBio(), null, null, entity.getId(), ATTR_BIO);
+        executeUpdate(sqlParamUpdate, null, entity.getBio(), null, null, null, entity.getId(), ATTR_BIO);
     }
 
     @Override

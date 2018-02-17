@@ -59,6 +59,7 @@ CREATE TABLE "params" (
   "number_val"  NUMBER,
   "text_val"    VARCHAR2(1000),
   "date_val"    TIMESTAMP(9),
+  "interval_val" INTERVAL DAY TO SECOND,
   "boolean_val" NUMBER(1, 0),
   CONSTRAINT "params_pk" PRIMARY KEY ("object_id", "attr_id"),
   CONSTRAINT "params_objects_fk" FOREIGN KEY ("object_id") REFERENCES "objects",
