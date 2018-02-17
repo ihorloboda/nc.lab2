@@ -35,7 +35,7 @@ public class UserDaoImpl extends AbstractDao<User> implements UserDao {
         String sqlObjectAdd = loadSqlStatement(SQL_OBJECT_ADD_PATH);
         entity.setId(generateId(TYPE_USER));
         entity.setVersion(DEFAULT_OBJECT_VERSION);
-        executeUpdate(sqlObjectAdd, entity.getId(), entity.getVersion(), TYPE_USER, entity.getName(), entity.getDesc());
+        executeUpdate(sqlObjectAdd, entity.getId(), entity.getVersion(), TYPE_USER, entity.getName(), entity.getDesc(), TYPE_ROOT);
     }
 
     @Override

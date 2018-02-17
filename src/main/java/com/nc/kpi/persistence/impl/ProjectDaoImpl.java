@@ -37,11 +37,10 @@ public class ProjectDaoImpl extends AbstractDao<Project> implements ProjectDao {
         String sqlObjectAdd = loadSqlStatement(SQL_OBJECT_ADD_PATH);
         entity.setId(generateId(TYPE_PROJECT));
         entity.setVersion(DEFAULT_OBJECT_VERSION);
-        executeUpdate(sqlObjectAdd, entity.getId(), entity.getVersion(), TYPE_PROJECT, entity.getName(), entity.getDesc());
+        executeUpdate(sqlObjectAdd, entity.getId(), entity.getVersion(), TYPE_PROJECT, entity.getName(), entity.getDesc(), TYPE_ROOT);
     }
 
     @Override
-    //TODO boolean
     protected void addParams(Project entity) {
         String sqlParamAdd = loadSqlStatement(SQL_PARAM_ADD_PATH);
         List<Object[]> params = new ArrayList<>(3);

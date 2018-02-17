@@ -41,6 +41,7 @@ public abstract class AbstractDao<T> implements CrudDao<T> {
     protected final Long DEFAULT_OBJECT_VERSION = 1L;
 
     //metamodel type constants
+    protected final int TYPE_ROOT = 0;
     protected final int TYPE_ROLE = 1;
     protected final int TYPE_QUALIFICATION = 2;
     protected final int TYPE_USER = 3;

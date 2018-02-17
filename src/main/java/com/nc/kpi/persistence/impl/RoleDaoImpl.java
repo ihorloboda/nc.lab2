@@ -64,7 +64,7 @@ public class RoleDaoImpl extends AbstractDao<Role> implements RoleDao {
     protected void addObject(Role entity) {
         String sql = loadSqlStatement(SQL_OBJECT_ADD_PATH);
         entity.setId(generateId(TYPE_ROLE));
-        executeUpdate(sql, entity.getId(), null, TYPE_ROLE, entity.getName(), entity.getDesc());
+        executeUpdate(sql, entity.getId(), null, TYPE_ROLE, entity.getName(), entity.getDesc(), TYPE_ROOT);
     }
 
     @Override

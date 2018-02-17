@@ -34,7 +34,7 @@ public class QualificationDaoImpl extends AbstractDao<Qualification> implements 
     protected void addObject(Qualification entity) {
         String sql = loadSqlStatement(SQL_OBJECT_ADD_PATH);
         entity.setId(generateId(TYPE_QUALIFICATION));
-        executeUpdate(sql, entity.getId(), null, TYPE_QUALIFICATION, entity.getName(), entity.getDesc());
+        executeUpdate(sql, entity.getId(), null, TYPE_QUALIFICATION, entity.getName(), entity.getDesc(), TYPE_ROOT);
     }
 
     @Override
