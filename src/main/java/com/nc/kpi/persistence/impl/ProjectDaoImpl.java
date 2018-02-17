@@ -55,9 +55,12 @@ public class ProjectDaoImpl extends AbstractDao<Project> implements ProjectDao {
     protected void addRefs(Project entity) {
         String sql = loadSqlStatement(SQL_REF_ADD_PATH);
         List<Object[]> refs = new ArrayList<>(2);
-        refs.add(new Object[]{entity.getId(), ATTR_CUSTOMER, entity.getCustomer().getId()});
-        refs.add(new Object[]{entity.getId(), ATTR_MANAGER, entity.getManager().getId()});
-        executeBatchUpdate(sql, refs);
+        if (entity.getCustomer() != null)
+            refs.add(new Object[]{entity.getId(), ATTR_CUSTOMER, entity.getCustomer().getId()});
+        if (entity.getManager() != null)
+            refs.add(new Object[]{entity.getId(), ATTR_MANAGER, entity.getManager().getId()});
+        if (refs.size() != 0)
+            executeBatchUpdate(sql, refs);
     }
 
     @Override
