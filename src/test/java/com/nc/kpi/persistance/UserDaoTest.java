@@ -49,6 +49,12 @@ public class UserDaoTest extends CrudDaoTest<User> {
         insertUsers();
     }
 
+    private void insertUsers() {
+        userDao.add(forFind);
+        userDao.add(forUpdate);
+        userDao.add(forDelete);
+    }
+
     private void initQualifications() {
         q1 = new Qualification();
         q2 = new Qualification();
@@ -104,12 +110,6 @@ public class UserDaoTest extends CrudDaoTest<User> {
         forFind.setRoles(rolesForFind);
         forUpdate.setRoles(rolesForUpdate);
         forDelete.setRoles(rolesForDelete);
-    }
-
-    private void insertUsers() {
-        userDao.add(forFind);
-        userDao.add(forUpdate);
-        userDao.add(forDelete);
     }
 
     @Override

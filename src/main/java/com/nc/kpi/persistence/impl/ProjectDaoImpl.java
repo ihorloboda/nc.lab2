@@ -13,6 +13,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,12 +22,6 @@ public class ProjectDaoImpl extends AbstractDao<Project> implements ProjectDao {
     @Autowired
     public ProjectDaoImpl(JdbcTemplate jdbcTemplate) {
         super(jdbcTemplate);
-    }
-
-    @Override
-    @Transactional
-    public Project find(Long id) {
-        return null;
     }
 
     @Override
@@ -46,54 +41,50 @@ public class ProjectDaoImpl extends AbstractDao<Project> implements ProjectDao {
     }
 
     @Override
+    //TODO boolean
     protected void addParams(Project entity) {
         String sqlParamAdd = loadSqlStatement(SQL_PARAM_ADD_PATH);
         List<Object[]> params = new ArrayList<>(3);
         params.add(new Object[]{entity.getId(), ATTR_ACTIVE, null, null, null, entity.getActive()});
-        params.add(new Object[]{entity.getId(), ATTR_START_DATE, null, null, entity.getStartDate(), null});
-        params.add(new Object[]{entity.getId(), ATTR_START_DATE, null, null, entity.getEndDate(), null});
+        params.add(new Object[]{entity.getId(), ATTR_START_DATE, null, null, Timestamp.from(entity.getStartDate().toInstant()), null});
+        params.add(new Object[]{entity.getId(), ATTR_END_DATE, null, null, Timestamp.from(entity.getEndDate().toInstant()), null});
         executeBatchUpdate(sqlParamAdd, params);
     }
 
     @Override
     protected void addRefs(Project entity) {
-        String sqlRefAdd = loadSqlStatement(SQL_REF_ADD_PATH);
+        String sql = loadSqlStatement(SQL_REF_ADD_PATH);
         List<Object[]> refs = new ArrayList<>(2);
         refs.add(new Object[]{entity.getId(), ATTR_CUSTOMER, entity.getCustomer().getId()});
         refs.add(new Object[]{entity.getId(), ATTR_MANAGER, entity.getManager().getId()});
-        executeBatchUpdate(sqlRefAdd, refs);
-    }
-
-    @Override
-    @Transactional
-    public void update(Project entity) {
-
+        executeBatchUpdate(sql, refs);
     }
 
     @Override
     protected void updateObject(Project entity) {
-
+        String sql = loadSqlStatement(SQL_OBJECT_UPDATE_PATH);
+        executeUpdate(sql, entity.getVersion() + 1, entity.getName(), entity.getDesc(), entity.getId());
     }
 
     @Override
     protected void updateParams(Project entity) {
-
+        String sql = loadSqlStatement(SQL_PARAM_UPDATE_PATH);
+        List<Object[]> batchArgs = new ArrayList<>();
+        batchArgs.add(new Object[]{null, null, null, entity.getActive(), entity.getId(), ATTR_ACTIVE,});
+        batchArgs.add(new Object[]{null, null, Timestamp.from(entity.getStartDate().toInstant()), null, entity.getId(), ATTR_START_DATE});
+        batchArgs.add(new Object[]{null, null, Timestamp.from(entity.getEndDate().toInstant()), null, entity.getId(), ATTR_END_DATE});
+        executeBatchUpdate(sql, batchArgs);
     }
 
     @Override
     protected void updateRefs(Project entity) {
-
+        deleteRefs(entity.getId());
+        addRefs(entity);
     }
 
     @Override
     protected void updateVersion(Project entity) {
-
-    }
-
-    @Override
-    @Transactional
-    public void delete(Long id) {
-
+        entity.setVersion(entity.getVersion() + 1);
     }
 
     @Override

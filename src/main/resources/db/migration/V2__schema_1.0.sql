@@ -58,7 +58,7 @@ CREATE TABLE "params" (
   "attr_id"     NUMBER(20, 0) NOT NULL,
   "number_val"  NUMBER,
   "text_val"    VARCHAR2(1000),
-  "date_val"    DATE,
+  "date_val"    TIMESTAMP(9),
   "boolean_val" NUMBER(1, 0),
   CONSTRAINT "params_pk" PRIMARY KEY ("object_id", "attr_id"),
   CONSTRAINT "params_objects_fk" FOREIGN KEY ("object_id") REFERENCES "objects",

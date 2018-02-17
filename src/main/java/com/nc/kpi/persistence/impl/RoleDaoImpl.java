@@ -44,8 +44,8 @@ public class RoleDaoImpl extends AbstractDao<Role> implements RoleDao {
     }
 
     private Role findRole(Long id) {
-        String sqlRoles = loadSqlStatement(SQL_ROLE_FIND_PATH);
-        return mapObject(findOne(sqlRoles, new roleRowMapper(), id));
+        String sql = loadSqlStatement(SQL_ROLE_FIND_PATH);
+        return mapObject(findOne(sql, new roleRowMapper(), id));
     }
 
     @Override
@@ -56,15 +56,15 @@ public class RoleDaoImpl extends AbstractDao<Role> implements RoleDao {
     }
 
     private void addRole(Role entity) {
-        String sqlRoles = loadSqlStatement(SQL_ROLE_ADD_PATH);
-        executeUpdate(sqlRoles, entity.getId(), entity.getName(), entity.getDesc());
+        String sql = loadSqlStatement(SQL_ROLE_ADD_PATH);
+        executeUpdate(sql, entity.getId(), entity.getName(), entity.getDesc());
     }
 
     @Override
     protected void addObject(Role entity) {
-        String sqlObjects = loadSqlStatement(SQL_OBJECT_ADD_PATH);
+        String sql = loadSqlStatement(SQL_OBJECT_ADD_PATH);
         entity.setId(generateId(TYPE_ROLE));
-        executeUpdate(sqlObjects, entity.getId(), null, TYPE_ROLE, entity.getName(), entity.getDesc());
+        executeUpdate(sql, entity.getId(), null, TYPE_ROLE, entity.getName(), entity.getDesc());
     }
 
     @Override
@@ -85,14 +85,14 @@ public class RoleDaoImpl extends AbstractDao<Role> implements RoleDao {
     }
 
     private void updateRole(Role entity) {
-        String sqlRoles = loadSqlStatement(SQL_ROLE_UPDATE_PATH);
-        executeUpdate(sqlRoles, entity.getName(), entity.getDesc(), entity.getId());
+        String sql = loadSqlStatement(SQL_ROLE_UPDATE_PATH);
+        executeUpdate(sql, entity.getName(), entity.getDesc(), entity.getId());
     }
 
     @Override
     protected void updateObject(Role entity) {
-        String sqlObjects = loadSqlStatement(SQL_OBJECT_UPDATE_PATH);
-        executeUpdate(sqlObjects, null, entity.getName(), entity.getDesc(), entity.getId());
+        String sql = loadSqlStatement(SQL_OBJECT_UPDATE_PATH);
+        executeUpdate(sql, null, entity.getName(), entity.getDesc(), entity.getId());
     }
 
     @Override
@@ -118,8 +118,8 @@ public class RoleDaoImpl extends AbstractDao<Role> implements RoleDao {
     }
 
     private void deleteRole(Long id) {
-        String sqlRoles = loadSqlStatement(SQL_ROLE_DELETE_PATH);
-        executeUpdate(sqlRoles, id);
+        String sql = loadSqlStatement(SQL_ROLE_DELETE_PATH);
+        executeUpdate(sql, id);
     }
 
     private class roleRowMapper implements RowMapper<ObjectRow> {

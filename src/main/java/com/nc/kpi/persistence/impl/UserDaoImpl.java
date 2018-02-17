@@ -46,6 +46,7 @@ public class UserDaoImpl extends AbstractDao<User> implements UserDao {
 
     @Override
     protected void addRefs(User entity) {
+        if (entity.getRoles() == null) return;
         String sqlRefAdd = loadSqlStatement(SQL_REF_ADD_PATH);
         List<Object[]> batchArgs = new ArrayList<>();
         entity.getRoles().stream().forEach(role -> {
