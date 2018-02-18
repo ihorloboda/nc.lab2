@@ -11,3 +11,4 @@ SELECT
   "boolean_val"
 FROM "params"
 WHERE "object_id" = ?
+-- Return nanoseconds instead interval

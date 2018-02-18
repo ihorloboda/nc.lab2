@@ -28,7 +28,8 @@ public class SprintDaoImpl extends AbstractDao<Sprint> implements SprintDao {
         String sql = loadSqlStatement(SQL_OBJECT_ADD_PATH);
         entity.setId(generateId(TYPE_SPRINT));
         entity.setVersion(DEFAULT_OBJECT_VERSION);
-        executeUpdate(sql, entity.getId(), entity.getVersion(), TYPE_SPRINT, entity.getName(), entity.getDesc(), TYPE_PROJECT);
+        executeUpdate(sql, entity.getId(), entity.getVersion(), TYPE_SPRINT, entity.getName(), entity.getDesc(),
+                entity.getProject().getId());
     }
 
     @Override

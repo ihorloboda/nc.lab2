@@ -6,6 +6,7 @@ import com.nc.kpi.persistence.metamodel.rows.RefRow;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
@@ -30,6 +31,7 @@ import java.util.Random;
 
 import static lombok.AccessLevel.PUBLIC;
 
+@Slf4j
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class AbstractDao<T> implements CrudDao<T> {
     //bounds for random number which added to new object id
@@ -120,8 +122,6 @@ public abstract class AbstractDao<T> implements CrudDao<T> {
     protected final String READ = "read";
     protected final String WRITE = "write";
 
-
-    //TODO check does it work?
     @Override
     @Transactional
     public void add(@NotNull T entity) {

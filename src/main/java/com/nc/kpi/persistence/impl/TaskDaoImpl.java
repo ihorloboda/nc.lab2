@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,39 +28,61 @@ public class TaskDaoImpl extends AbstractDao<Task> implements TaskDao {
     protected void addObject(Task entity) {
         String sql = loadSqlStatement(SQL_OBJECT_ADD_PATH);
         entity.setId(generateId(TYPE_TASK));
-        executeUpdate(sql, entity.getId(), DEFAULT_OBJECT_VERSION, TYPE_TASK, entity.getName(), entity.getDesc(), TYPE_SPRINT);
+        entity.setVersion(DEFAULT_OBJECT_VERSION);
+        executeUpdate(sql, entity.getId(), DEFAULT_OBJECT_VERSION, TYPE_TASK, entity.getName(), entity.getDesc(),
+                entity.getSprint().getId());
     }
 
     @Override
     protected void addParams(Task entity) {
         String sql = loadSqlStatement(SQL_PARAM_ADD_PATH);
-        List<Object[]> params = new ArrayList<>();
-
+        List<Object[]> params = new ArrayList<>(4);
+        params.add(new Object[]{entity.getId(), ATTR_ACTIVE, null, null, null, null, entity.getActive()});
+        params.add(new Object[]{entity.getId(), ATTR_ESTIMATE, null, null,
+                Timestamp.from(entity.getEstimate().toInstant()), null, null});
+        params.add(new Object[]{entity.getId(), ATTR_ACTUAL, null, null,
+                Timestamp.from(entity.getActual().toInstant()), null, null});
+        params.add(new Object[]{entity.getId(), ATTR_OVERTIME, null, null, null, entity.getOvertime().toNanos(), null});
+        executeBatchUpdate(sql, params);
     }
 
     @Override
     protected void addRefs(Task entity) {
-
+        String sql = loadSqlStatement(SQL_REF_ADD_PATH);
+        List<Object[]> refs = new ArrayList<>(2);
+        refs.add(new Object[]{entity.getId(), ATTR_QUALIFICATION, entity.getQualification().getId()});
+        refs.add(new Object[]{entity.getId(), ATTR_SPRINT, entity.getSprint().getId()});
+        executeBatchUpdate(sql, refs);
     }
 
     @Override
     protected void updateObject(Task entity) {
-
+        String sql = loadSqlStatement(SQL_OBJECT_UPDATE_PATH);
+        executeUpdate(sql, entity.getVersion() + 1, entity.getName(), entity.getDesc(), entity.getId());
     }
 
     @Override
     protected void updateParams(Task entity) {
-
+        String sql = loadSqlStatement(SQL_PARAM_UPDATE_PATH);
+        List<Object[]> params = new ArrayList<>(4);
+        params.add(new Object[]{null, null, null, null, entity.getActive(), entity.getId(), ATTR_ACTIVE});
+        params.add(new Object[]{null, null, Timestamp.from(entity.getEstimate().toInstant()), null, null,
+                entity.getId(), ATTR_ESTIMATE});
+        params.add(new Object[]{null, null, Timestamp.from(entity.getActual().toInstant()), null, null,
+                entity.getId(), ATTR_ACTUAL});
+        params.add(new Object[]{null, null, null, entity.getOvertime().toNanos(), null, entity.getId(), ATTR_OVERTIME});
+        executeBatchUpdate(sql, params);
     }
 
     @Override
     protected void updateRefs(Task entity) {
-
+        deleteRefs(entity.getId());
+        addRefs(entity);
     }
 
     @Override
     protected void updateVersion(Task entity) {
-
+        entity.setVersion(entity.getVersion() + 1);
     }
 
     @Override
